@@ -1,34 +1,43 @@
 # BioPhysGS
 
-Codebase for our physics-guided Gaussian splatting pipeline.
+BioPhysGS is a physics-guided Gaussian splatting codebase for scene reconstruction, rendering, and evaluation.
 
-## Structure
+## Repository Layout
 
 ```text
 .
-|-- arguments/
-|-- gaussian_renderer/
-|-- lpipsPyTorch/
-|-- scene/
-|-- utils/
-|-- train.py
-|-- render.py
-|-- render_video.py
-|-- metrics.py
-|-- convert.py
-|-- runAll.sh
-|-- environment.yml
-|-- requirements.txt
+|-- arguments/              # argument definitions
+|-- gaussian_renderer/      # differentiable renderer
+|-- lpipsPyTorch/           # local LPIPS implementation
+|-- scene/                  # scene representation and loading
+|-- utils/                  # utility helpers
+|-- train.py                # training entry point
+|-- render.py               # rendering entry point
+|-- render_video.py         # video rendering
+|-- metrics.py              # evaluation script
+|-- convert.py              # COLMAP conversion helper
+|-- runAll.sh               # batch training template
+|-- environment.yml         # conda environment
+|-- requirements.txt        # lightweight Python requirements
 ```
 
+## Requirements
+
+- Python 3.10
+- PyTorch 2.1 with CUDA 11.8
+- A working CUDA toolchain for custom extensions
+- COLMAP-format input data for training
+
 ## Setup
+
+Recommended:
 
 ```bash
 conda env create -f environment.yml
 conda activate biophysgs
 ```
 
-Or install manually:
+Manual setup:
 
 ```bash
 conda create -n biophysgs python=3.10
@@ -38,12 +47,14 @@ conda install cudatoolkit-dev=11.8 -c conda-forge
 pip install -r requirements.txt
 ```
 
+If you use custom CUDA rasterization or nearest-neighbor extensions, make sure their local packages are installed in your environment before training.
+
 ## Data Layout
 
 ```text
 <scene_root>
 |-- images/
-|-- depths/
+|-- depths/                  # optional depth priors
 `-- sparse/
     `-- 0/
         |-- cameras.bin
@@ -54,38 +65,44 @@ pip install -r requirements.txt
 
 ## Usage
 
-Train:
+Training:
 
 ```bash
 python train.py -s <scene_root>
 ```
 
-Train with evaluation:
+Training with evaluation:
 
 ```bash
 python train.py -s <scene_root> --eval
 ```
 
-Train with depth priors:
+Training with depth priors:
 
 ```bash
 python train.py -s <scene_root> -d <depth_dir>
 ```
 
-Render:
+Rendering:
 
 ```bash
 python render.py -m <model_dir>
 ```
 
-Evaluate:
+Metric evaluation:
 
 ```bash
 python metrics.py -m <model_dir>
 ```
 
-Batch script:
+Batch script template:
 
 ```bash
 bash runAll.sh
 ```
+
+## Notes
+
+- `runAll.sh` is only a template and should be edited for your own dataset paths and GPU ids.
+- `metrics.py` and `render.py` require a full runtime environment with PyTorch installed.
+- If you use depth supervision, make sure the depth files and `depth_params.json` are consistent with your scene layout.

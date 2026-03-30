@@ -1,4 +1,4 @@
-
+﻿
 import os
 import torch
 import torch.nn.functional as F
@@ -152,27 +152,27 @@ def training(dataset, opt, pipe, testing_iterations, saving_iterations, checkpoi
             # print(invDepth.shape, mono_invdepth.shape)  
             depth_mask = viewpoint_cam.depth_mask.cuda()
             
-            # 优化的深度损失计�?            # 1. 转换逆深度为深度（米�?            epsilon = 1e-6
+            # 浼樺寲鐨勬繁搴︽崯澶辫绠?            # 1. 杞崲閫嗘繁搴︿负娣卞害锛堢背锛?            epsilon = 1e-6
 
             rendered_depth = 1.0 / (invDepth + epsilon)
-            gt_depth_m = mono_invdepth  # GT深度
-            # rendered_depth = 1.0 / (invDepth + epsilon)  # 渲染深度
-            # gt_depth_m = 1.0 / (mono_invdepth + epsilon)  # GT深度
+            gt_depth_m = mono_invdepth  # GT娣卞害
+            # rendered_depth = 1.0 / (invDepth + epsilon)  # 娓叉煋娣卞害
+            # gt_depth_m = 1.0 / (mono_invdepth + epsilon)  # GT娣卞害
 
 
-            # 2. 创建有效掩码 - GT深度 > 0.01m 意味着忽略太近的点，增加稳定�?            mask = (gt_depth_m > 0.005) & (rendered_depth > 0) & (depth_mask > 0)
+            # 2. 鍒涘缓鏈夋晥鎺╃爜 - GT娣卞害 > 0.01m 鎰忓懗鐫€蹇界暐澶繎鐨勭偣锛屽鍔犵ǔ瀹氭€?            mask = (gt_depth_m > 0.005) & (rendered_depth > 0) & (depth_mask > 0)
             
-            # 如果没有有效的重叠区域，则不计算损失
+            # 濡傛灉娌℃湁鏈夋晥鐨勯噸鍙犲尯鍩燂紝鍒欎笉璁＄畻鎹熷け
             if not torch.any(mask):
                 Ll1depth_pure = torch.tensor(0.0, device=rendered_depth.device)
             else:
-                # 3. 提取有效深度�?                rendered_masked = torch.masked_select(rendered_depth, mask)
+                # 3. 鎻愬彇鏈夋晥娣卞害鍊?                rendered_masked = torch.masked_select(rendered_depth, mask)
                 gt_masked = torch.masked_select(gt_depth_m, mask)
                 
-                # 4. 计算尺度因子并对�?                # 使用 .detach() 来阻止梯度流经这个对齐过�?                scale_factor = (torch.median(gt_masked) / torch.median(rendered_masked)).detach()
+                # 4. 璁＄畻灏哄害鍥犲瓙骞跺榻?                # 浣跨敤 .detach() 鏉ラ樆姝㈡搴︽祦缁忚繖涓榻愯繃绋?                scale_factor = (torch.median(gt_masked) / torch.median(rendered_masked)).detach()
                 rendered_depth_aligned = rendered_depth * scale_factor
                 
-                # 5. 计算损失
+                # 5. 璁＄畻鎹熷け
                 Ll1depth_pure = torch.nn.functional.l1_loss(
                     rendered_depth_aligned[mask], 
                     gt_depth_m[mask]

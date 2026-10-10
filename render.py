@@ -1,3 +1,13 @@
+#
+# Copyright (C) 2023, Inria
+# GRAPHDECO research group, https://team.inria.fr/graphdeco
+# All rights reserved.
+#
+# This software is free for non-commercial, research and evaluation use
+# under the terms of the LICENSE.md file.
+#
+# For inquiries contact  george.drettakis@inria.fr
+#
 import matplotlib.pyplot as plt
 import torch
 from scene import Scene
@@ -8,7 +18,7 @@ from gaussian_renderer import render
 import torchvision
 from utils.general_utils import safe_state, depth_with_colormap
 from argparse import ArgumentParser
-from arguments import ModelParams, PipelineParams, OptimizationParams, get_combined_args
+from arguments import ModelParams, PipelineParams, get_combined_args
 from gaussian_renderer import GaussianModel
 import time
 import numpy as np
@@ -55,8 +65,9 @@ def render_set(model_path, name, iteration, views, gaussians, pipeline, backgrou
 
         rendering, clear, depth, attenuation, backscatter = render_pkg["render"], render_pkg["restore_scene"], \
             render_pkg["depth"], render_pkg["attenuation"], render_pkg["backscatter"]
+        np.save(os.path.join(depth_path, os.path.splitext(view.image_name)[0] + ".npy"), depth.squeeze(0).detach().cpu().numpy())
 
-        depth = depth_with_colormap(depth, colormap='turbo')  # turbo as NeRFStudio 
+        depth = depth_with_colormap(depth, colormap='turbo')  # turbo as NeRFStudio
         gt = view.original_image[0:3, :, :]
 
         if args.train_test_exp:
@@ -65,8 +76,8 @@ def render_set(model_path, name, iteration, views, gaussians, pipeline, backgrou
             clear = clear[..., clear.shape[-1] // 2:]
             depth = depth[..., depth.shape[-1] // 2:]
 
-        mean_fps = np.mean(fps_list[5:])  
-    
+        mean_fps = np.mean(fps_list[5:])
+
         torchvision.utils.save_image(rendering, os.path.join(render_path, view.image_name))
         torchvision.utils.save_image(gt, os.path.join(gts_path, view.image_name))
         torchvision.utils.save_image(clear, os.path.join(clear_path, view.image_name))
@@ -74,9 +85,9 @@ def render_set(model_path, name, iteration, views, gaussians, pipeline, backgrou
         torchvision.utils.save_image(attenuation, os.path.join(attenuation_path, view.image_name))
         torchvision.utils.save_image(backscatter, os.path.join(backscatter_path, view.image_name))
 
-def render_sets(dataset : ModelParams, opt, iteration : int, pipeline : PipelineParams, skip_train : bool, skip_test : bool, separate_sh: bool):
+def render_sets(dataset : ModelParams, iteration : int, pipeline : PipelineParams, skip_train : bool, skip_test : bool, separate_sh: bool):
     with torch.no_grad():
-        gaussians = GaussianModel(dataset.sh_degree, embedding_dim=opt.embedding_dims)
+        gaussians = GaussianModel(dataset.sh_degree)
         scene = Scene(dataset, gaussians, load_iteration=iteration, shuffle=False)
 
         bg_color = [1, 1, 1] if dataset.white_background else [0, 0, 0]
@@ -93,7 +104,6 @@ if __name__ == "__main__":
     parser = ArgumentParser(description="Testing script parameters")
     model = ModelParams(parser, sentinel=True)
     pipeline = PipelineParams(parser)
-    optimization = OptimizationParams(parser)
     parser.add_argument("--iteration", default=-1, type=int)
     parser.add_argument("--skip_train", action="store_true")
     parser.add_argument("--skip_test", action="store_true")
@@ -104,4 +114,4 @@ if __name__ == "__main__":
     # Initialize system state (RNG)
     safe_state(args.quiet)
 
-    render_sets(model.extract(args), optimization.extract(args), args.iteration, pipeline.extract(args), args.skip_train, args.skip_test, SPARSE_ADAM_AVAILABLE)
+    render_sets(model.extract(args), args.iteration, pipeline.extract(args), args.skip_train, args.skip_test, SPARSE_ADAM_AVAILABLE)

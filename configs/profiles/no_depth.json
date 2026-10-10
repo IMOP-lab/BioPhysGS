@@ -1,0 +1,9 @@
+{
+  "profile": "no_depth",
+  "code_directory": ".",
+  "iterations": 30000,
+  "flags": [
+    "--disable_depth_alignment"
+  ],
+  "evaluation_protocol": "legacy"
+}

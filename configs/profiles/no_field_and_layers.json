@@ -1,0 +1,10 @@
+{
+  "profile": "no_field_and_layers",
+  "code_directory": ".",
+  "iterations": 30000,
+  "flags": [
+    "--disable_bio_optical_field",
+    "--disable_dual_layer"
+  ],
+  "evaluation_protocol": "legacy"
+}

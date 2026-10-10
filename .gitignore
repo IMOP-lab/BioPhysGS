@@ -1,54 +1,23 @@
-# Python cache
-__pycache__/
-*.py[cod]
-*$py.class
-
-# Build artifacts
+# Local data, models, builds and environments
 build/
-dist/
-*.egg-info/
-*.so
-*.pyd
-*.dll
-
-# Virtual environments
-.venv/
-venv/
-env/
-
-# IDE and OS files
-.idea/
-.vscode/
-.DS_Store
-Thumbs.db
-
-# Logs and experiment outputs
-logs/
-outputs/
-output/
-tmp/
-wandb/
-runs/
-events.out.tfevents*
-*.log
-
-# Checkpoints and large artifacts
-*.pth
-*.ckpt
-*.pt
-*.npz
-
-# Dataset files
 data/
 datasets/
-优化方案/
-
-# Local viewer/runtime artifacts
-SIBR_viewers/install/
-SIBR_viewers/bin/
-
-# Submodule local build outputs
-submodules/simple-knn/build/
-submodules/simple-knn/simple_knn.egg-info/
-submodules/diff-gaussian-rasterization/build/
-submodules/fused-ssim/build/
+outputs/
+output/
+checkpoints/
+.venv/
+*.egg-info/
+__pycache__/
+*.py[cod]
+*.so
+*.o
+*.a
+*.pt
+*.pth
+*.ckpt
+*.log
+.env
+.env.*
+.DS_Store
+initialization/thirdparty/eigen/
+initialization/thirdparty/lietorch/

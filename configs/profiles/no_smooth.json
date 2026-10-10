@@ -1,0 +1,9 @@
+{
+  "profile": "no_smooth",
+  "code_directory": ".",
+  "iterations": 30000,
+  "flags": [
+    "--disable_smooth"
+  ],
+  "evaluation_protocol": "legacy"
+}

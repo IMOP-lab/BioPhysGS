@@ -1,3 +1,13 @@
+#
+# Copyright (C) 2023, Inria
+# GRAPHDECO research group, https://team.inria.fr/graphdeco
+# All rights reserved.
+#
+# This software is free for non-commercial, research and evaluation use
+# under the terms of the LICENSE.md file.
+#
+# For inquiries contact  george.drettakis@inria.fr
+#
 
 from argparse import ArgumentParser, Namespace
 import sys
@@ -15,7 +25,7 @@ class ParamGroup:
                 shorthand = True
                 key = key[1:]
             t = type(value)
-            value = value if not fill_none else None 
+            value = value if not fill_none else None
             if shorthand:
                 if t == bool:
                     group.add_argument("--" + key, ("-" + key[0:1]), default=value, action="store_true")
@@ -34,7 +44,7 @@ class ParamGroup:
                 setattr(group, arg[0], arg[1])
         return group
 
-class ModelParams(ParamGroup): 
+class ModelParams(ParamGroup):
     def __init__(self, parser, sentinel=False):
         self.sh_degree = 3
         self._source_path = ""
@@ -60,6 +70,15 @@ class PipelineParams(ParamGroup):
         self.compute_cov3D_python = False
         self.debug = False
         self.antialiasing = False
+        # Controlled renderer ablations. All default to the full model.
+        self.disable_bio_optical_field = False
+        self.disable_dual_layer = False
+        self.disable_spatial_attenuation = False
+        self.disable_hemoglobin = False
+        self.disable_fresnel = False
+        self.disable_surface_specular = False
+        self.disable_image_sss = False
+        self.generic_capacity_control = False
         super().__init__(parser, "Pipeline Parameters")
 
 class OptimizationParams(ParamGroup):
@@ -124,6 +143,24 @@ class OptimizationParams(ParamGroup):
         self.densify_grad_threshold = 0.0002
         self.depth_l1_weight_init = 1.0
         self.depth_l1_weight_final = 0.01
+        self.depth_loss_multiplier = 1.0
+        self.apply_depth_scheduler = False
+        self.disable_depth_alignment = False
+        self.disable_smooth = False
+        self.disable_tv = False
+        self.disable_scale = False
+
+        # Explicit starts preserve the current Full behavior by default.
+        self.depth_from_iter = 500
+        self.smooth_from_iter = 500
+        self.scale_from_iter = 0
+        self.smooth_weight_init = 0.01
+        self.smooth_weight_final = 0.001
+
+        # Initial values for physical-parameter sensitivity experiments.
+        self.light_distance_factor_init = 2.0
+        self.tissue_scattering_length_init = 1.5
+        self.absorption_coefficient_init = 0.1
 
         self.densify_grad_abs_threshold = 0.0004
 
@@ -154,7 +191,12 @@ class OptimizationParams(ParamGroup):
 
         self.random_background = False
         self.optimizer_type = "default"
-        
+        # Keep sparse/monocular samples from being completely pruned during
+        # long runs; disabled only when explicitly requested by an experiment.
+        self.disable_pruning = False
+        self.disable_reduce = False
+        self.disable_opacity_reset = False
+
         super().__init__(parser, "Optimization Parameters")
 
 def get_combined_args(parser : ArgumentParser):

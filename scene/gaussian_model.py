@@ -1,3 +1,13 @@
+#
+# Copyright (C) 2023, Inria
+# GRAPHDECO research group, https://team.inria.fr/graphdeco
+# All rights reserved.
+#
+# This software is free for non-commercial, research and evaluation use
+# under the terms of the LICENSE.md file.
+#
+# For inquiries contact  george.drettakis@inria.fr
+#
 
 import torch
 import numpy as np
@@ -46,11 +56,10 @@ class GaussianModel:
         # self.colour_activation = nn.Sigmoid()
         # self.sigma_activation = nn.Softplus()
 
-    def __init__(self, sh_degree, optimizer_type="default", embedding_dim=16):
+    def __init__(self, sh_degree, optimizer_type="default"):
         self.active_sh_degree = 0
         self.optimizer_type = optimizer_type
         self.max_sh_degree = sh_degree
-        self.embedding_dim = embedding_dim
         self._xyz = torch.empty(0)
         self._features_dc = torch.empty(0)
         self._features_rest = torch.empty(0)
@@ -71,28 +80,38 @@ class GaussianModel:
 
         self.setup_functions()
 
-        self.embeddings = self._build_embeddings(embedding_dim)
+        self.embeddings = torch.empty(0)
 
         self.position_encoding = PositionalEncoding(3, 4).to("cuda")
         posi_dims = self.position_encoding.get_output_n_channels()
-        
-        # 使用内窥镜模型替代水下模�?        self.appearance_mlp = EndoscopeEmbeddingModel(
+
+        # 使用内窥镜模型替代水下模型
+        self.appearance_mlp = EndoscopeEmbeddingModel(
             appearance_n_fourier_freqs=4,
             sh_degree=3,
-            appearance_embedding_dim = 16,
+            appearance_embedding_dim = 43,
             appearance_model_sh=False,
         ).to("cuda")
 
         # 使用高光反射模型替代后向散射模型
         self.bs_model = SpecularReflectionNet().to("cuda")
-        # 使用次表面散射模型替代衰减模�?        self.da_model = SubsurfaceScatterNet().to("cuda")
+        # 使用次表面散射模型替代衰减模型
+        self.da_model = SubsurfaceScatterNet().to("cuda")
 
-    def _build_embeddings(self, embedding_dim):
-        return nn.Sequential(
-            nn.Linear(108, 128),
-            nn.ReLU(),
-            nn.Linear(128, embedding_dim),
-        ).to("cuda")
+    def set_physical_parameter_initial_values(self, light_distance_factor,
+                                              tissue_scattering_length,
+                                              absorption_coefficient):
+        values = {
+            "light_distance_factor": light_distance_factor,
+            "tissue_scattering_length": tissue_scattering_length,
+            "absorption_coefficient": absorption_coefficient,
+        }
+        if any(value <= 0 for value in values.values()):
+            raise ValueError(f"Physical parameter initial values must be positive: {values}")
+        with torch.no_grad():
+            self.bs_model.light_distance_factor.fill_(light_distance_factor)
+            self.da_model.tissue_scattering_length.fill_(tissue_scattering_length)
+            self.da_model.absorption_coefficient.fill_(absorption_coefficient)
 
     def capture(self):
         return (
@@ -109,13 +128,7 @@ class GaussianModel:
             self.xyz_gradient_accum_abs,
             self.denom,
             self.optimizer.state_dict(),
-            self.exposure_optimizer.state_dict(),
             self.spatial_lr_scale,
-            self._exposure,
-            self.appearance_mlp.state_dict(),
-            self.bs_model.state_dict(),
-            self.da_model.state_dict(),
-            self.embeddings.state_dict(),
         )
 
     def restore(self, model_args, training_args):
@@ -132,23 +145,12 @@ class GaussianModel:
          xyz_gradient_accum_abs,
          denom,
          opt_dict,
-         exposure_opt_dict,
-         self.spatial_lr_scale,
-         self._exposure,
-         appearance_state_dict,
-         bs_state_dict,
-         da_state_dict,
-         embeddings_state_dict) = model_args
+         self.spatial_lr_scale) = model_args
         self.training_setup(training_args)
         self.xyz_gradient_accum = xyz_gradient_accum
         self.xyz_gradient_accum_abs = xyz_gradient_accum_abs
         self.denom = denom
         self.optimizer.load_state_dict(opt_dict)
-        self.exposure_optimizer.load_state_dict(exposure_opt_dict)
-        self.appearance_mlp.load_state_dict(appearance_state_dict)
-        self.bs_model.load_state_dict(bs_state_dict)
-        self.da_model.load_state_dict(da_state_dict)
-        self.embeddings.load_state_dict(embeddings_state_dict)
 
     @property
     def get_scaling(self):
@@ -331,8 +333,7 @@ class GaussianModel:
         out_weights_path = model_path
         save_dict = {
             "appearance_mlp": self.appearance_mlp.state_dict(),
-            "embedding_dim": self.embedding_dim,
-            "embeddings": self.embeddings.state_dict(),
+            "embeddings": self.embeddings,
             "bs_model": self.bs_model.state_dict(),
             "da_model": self.da_model.state_dict(),
         }
@@ -344,13 +345,8 @@ class GaussianModel:
 
         checkpoint = torch.load(weights_path)
 
-        embedding_dim = checkpoint.get("embedding_dim", self.embedding_dim)
-        if embedding_dim != self.embedding_dim:
-            self.embedding_dim = embedding_dim
-            self.embeddings = self._build_embeddings(embedding_dim)
-
         self.appearance_mlp.load_state_dict(checkpoint["appearance_mlp"])
-        self.embeddings.load_state_dict(checkpoint["embeddings"])
+        self.embeddings = checkpoint["embeddings"]
         self.bs_model.load_state_dict(checkpoint["bs_model"])
         self.da_model.load_state_dict(checkpoint["da_model"])
 
@@ -630,12 +626,17 @@ class GaussianModel:
         self.densify_and_clone(grads, max_grad, extent)
         self.densify_and_split(grads_abs, max_grad_abs, extent)
 
-        prune_mask = (self.get_opacity < min_opacity).squeeze()
-        if max_screen_size:
-            big_points_vs = self.max_radii2D > max_screen_size
-            big_points_ws = self.get_scaling.max(dim=1).values > 0.1 * extent
-            prune_mask = torch.logical_or(torch.logical_or(prune_mask, big_points_vs), big_points_ws)
-        self.prune_points(prune_mask)
+        # In diagnostic/long-run experiments pruning can catastrophically remove
+        # the whole point set (especially with monocular endoscopic views).  The
+        # train flag sets min_opacity to zero, but screen-size pruning would still
+        # remove points; honor the flag by disabling *all* pruning here.
+        if min_opacity > 0 or max_screen_size:
+            prune_mask = (self.get_opacity < min_opacity).squeeze()
+            if max_screen_size:
+                big_points_vs = self.max_radii2D > max_screen_size
+                big_points_ws = self.get_scaling.max(dim=1).values > 0.1 * extent
+                prune_mask = torch.logical_or(torch.logical_or(prune_mask, big_points_vs), big_points_ws)
+            self.prune_points(prune_mask)
         tmp_radii = self.tmp_radii
         self.tmp_radii = None
 

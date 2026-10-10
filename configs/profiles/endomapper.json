@@ -1,0 +1,7 @@
+{
+  "profile": "endomapper",
+  "code_directory": ".",
+  "iterations": 30000,
+  "flags": [],
+  "evaluation_protocol": "standardized"
+}

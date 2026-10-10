@@ -1,0 +1,8 @@
+{
+  "profile": "hamlyn",
+  "code_directory": "variants/hamlyn",
+  "iterations": 30000,
+  "fixed_seed": 0,
+  "flags": [],
+  "evaluation_protocol": "legacy"
+}

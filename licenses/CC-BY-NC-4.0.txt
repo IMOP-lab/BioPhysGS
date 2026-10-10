@@ -1,0 +1,11 @@
+Depth Anything V2 ViT-B fine-tuned weights: license notice
+
+The upstream ViT-B weights are licensed under Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0).
+The fine-tuned BioPhysGS inference checkpoint retains these terms.
+
+Full license: https://creativecommons.org/licenses/by-nc/4.0/legalcode.en
+Upstream: https://github.com/DepthAnything/Depth-Anything-V2
+Model: https://huggingface.co/depth-anything/Depth-Anything-V2-Base
+
+Attribution: Lihe Yang, Bingyi Kang, Zilong Huang, Zhen Zhao, Xiaogang Xu, Jiashi Feng and Hengshuang Zhao, Depth Anything V2 (2024).
+Modification: ViT-B fine-tuning on the documented SyntheticColon training split; inference tensors repackaged without optimizer state.

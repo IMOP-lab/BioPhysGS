@@ -1,17 +1,9 @@
 name: biophysgs
 channels:
-  - pytorch
   - conda-forge
-  - defaults
 dependencies:
-  - cudatoolkit=11.8
-  - plyfile
   - python=3.10
-  - pip=22.3.1
-  - pytorch=2.1.0
-  - torchaudio=2.1.0
-  - torchvision=0.16.0
-  - tqdm
+  - pip
   - pip:
-    - opencv-python
-    - joblib
+      - -r requirements.txt
+# Install CUDA 11.8 PyTorch wheels and extensions following README.md.

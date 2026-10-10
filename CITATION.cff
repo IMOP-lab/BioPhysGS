@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+message: "Please cite the BioPhysGS manuscript and relevant upstream components."
+type: software
+title: "BioPhysGS: Physics Guided 3D Gaussian Reconstruction with Bio Optical Priors for Endoscopy"
+version: 0.1.0
+date-released: 2026-10-10
+url: "https://github.com/IMOP-lab/BioPhysGS"
+authors:
+  - family-names: Zou
+    given-names: Binfeng
+  - family-names: Liu
+    given-names: Jin
+  - family-names: Chen
+    given-names: Jiagang
+  - family-names: Huang
+    given-names: Zhao
+  - family-names: Tang
+    given-names: Wenwen
+  - family-names: Zhang
+    given-names: Xiaoshuai
+  - family-names: Zhou
+    given-names: Huiyu
+  - family-names: Zheng
+    given-names: Zhiwen
+  - family-names: Huang
+    given-names: Xingru

@@ -25,13 +25,13 @@ def get_scales(key, cameras, images, points3d_ordered, args):
     R = qvec2rotmat(image_meta.qvec)
     pts = np.dot(pts, R.T) + image_meta.tvec
 
-    invcolmapdepth = 1. / pts[..., 2] 
+    invcolmapdepth = 1. / pts[..., 2]
     n_remove = len(image_meta.name.split('.')[-1]) + 1
     invmonodepthmap = cv2.imread(f"{args.depths_dir}/{image_meta.name[:-n_remove]}.png", cv2.IMREAD_UNCHANGED)
-    
+
     if invmonodepthmap is None:
         return None
-    
+
     if invmonodepthmap.ndim != 2:
         invmonodepthmap = invmonodepthmap[..., 0]
 
@@ -40,16 +40,16 @@ def get_scales(key, cameras, images, points3d_ordered, args):
 
     maps = (valid_xys * s).astype(np.float32)
     valid = (
-        (maps[..., 0] >= 0) * 
-        (maps[..., 1] >= 0) * 
-        (maps[..., 0] < cam_intrinsic.width * s) * 
+        (maps[..., 0] >= 0) *
+        (maps[..., 1] >= 0) *
+        (maps[..., 0] < cam_intrinsic.width * s) *
         (maps[..., 1] < cam_intrinsic.height * s) * (invcolmapdepth > 0))
-    
+
     if valid.sum() > 10 and (invcolmapdepth.max() - invcolmapdepth.min()) > 1e-3:
         maps = maps[valid, :]
         invcolmapdepth = invcolmapdepth[valid]
         invmonodepth = cv2.remap(invmonodepthmap, maps[..., 0], maps[..., 1], interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_REPLICATE)[..., 0]
-        
+
         ## Median / dev
         t_colmap = np.median(invcolmapdepth)
         s_colmap = np.mean(np.abs(invcolmapdepth - t_colmap))

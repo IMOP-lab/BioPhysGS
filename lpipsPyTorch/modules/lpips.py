@@ -10,7 +10,7 @@ class LPIPS(nn.Module):
     Learned Perceptual Image Patch Similarity (LPIPS).
 
     Arguments:
-        net_type (str): the network type to compare the features: 
+        net_type (str): the network type to compare the features:
                         'alex' | 'squeeze' | 'vgg'. Default: 'alex'.
         version (str): the version of LPIPS. Default: 0.1.
     """

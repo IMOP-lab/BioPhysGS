@@ -35,4 +35,4 @@ def simple_color_balance(image, scale=0.01, alpha=0.1):
         stretched = (clipped - pmin) / (pmax - pmin + 1e-6)
         out[ch] = stretched.reshape(image.shape[1], image.shape[2])
 
-    return out 
+    return out

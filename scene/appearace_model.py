@@ -32,7 +32,7 @@ class EmbeddingModel(nn.Module):
                 "activation": "ReLU",
                 "output_activation": "None",
                 "n_neurons": 128,
-                "n_hidden_layers": 2,  
+                "n_hidden_layers": 2,
             }
             self.mlp = tcnn.Network(
                 n_input_dims=mlp_input_dim,
@@ -113,12 +113,10 @@ class DeattenuateNet(nn.Module):
         beta_d = torch.stack(tuple(
             torch.sum(attn_conv[:, i:i + 2, :, :] * self.sigmoid(self.attenuation_coef[i:i + 2]), dim=1) for i in
             range(0, 6, 2)), dim=1)
- 
+
         attenuation_map = torch.exp(-1.0 * torch.clamp(beta_d, 0.0) * depth).squeeze(0)
 
 
         attenuation_map = self.sigmoid(attenuation_map)
 
         return attenuation_map
-
-

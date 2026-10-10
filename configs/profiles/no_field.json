@@ -1,0 +1,9 @@
+{
+  "profile": "no_field",
+  "code_directory": ".",
+  "iterations": 30000,
+  "flags": [
+    "--disable_bio_optical_field"
+  ],
+  "evaluation_protocol": "legacy"
+}

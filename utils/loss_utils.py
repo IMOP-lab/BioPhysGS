@@ -1,3 +1,13 @@
+#
+# Copyright (C) 2023, Inria
+# GRAPHDECO research group, https://team.inria.fr/graphdeco
+# All rights reserved.
+#
+# This software is free for non-commercial, research and evaluation use
+# under the terms of the LICENSE.md file.
+#
+# For inquiries contact  george.drettakis@inria.fr
+#
 import lpips
 import torch
 import torch.nn.functional as F
@@ -73,7 +83,7 @@ def _ssim(img1, img2, window, window_size, channel, size_average=True):
     # Check for NaN or inf values in input images
     if torch.isnan(img1).any() or torch.isinf(img1).any() or torch.isnan(img2).any() or torch.isinf(img2).any():
         return torch.tensor(0.0, device=img1.device, requires_grad=True)
-    
+
     mu1 = F.conv2d(img1, window, padding=window_size // 2, groups=channel)
     mu2 = F.conv2d(img2, window, padding=window_size // 2, groups=channel)
 
@@ -89,20 +99,20 @@ def _ssim(img1, img2, window, window_size, channel, size_average=True):
     C2 = 0.03 ** 2
 
     # Check for NaN values in intermediate calculations
-    if (torch.isnan(mu1_sq).any() or torch.isnan(mu2_sq).any() or 
-        torch.isnan(sigma1_sq).any() or torch.isnan(sigma2_sq).any() or 
+    if (torch.isnan(mu1_sq).any() or torch.isnan(mu2_sq).any() or
+        torch.isnan(sigma1_sq).any() or torch.isnan(sigma2_sq).any() or
         torch.isnan(sigma12).any()):
         return torch.tensor(0.0, device=img1.device, requires_grad=True)
 
     # More stable SSIM calculation with epsilon to prevent division by zero
     numerator = (2 * mu1_mu2 + C1) * (2 * sigma12 + C2)
     denominator = (mu1_sq + mu2_sq + C1) * (sigma1_sq + sigma2_sq + C2)
-    
+
     # Add small epsilon to prevent division by zero
     denominator = torch.clamp(denominator, min=1e-8)
-    
+
     ssim_map = numerator / denominator
-    
+
     # Final NaN check
     if torch.isnan(ssim_map).any() or torch.isinf(ssim_map).any():
         return torch.tensor(0.0, device=img1.device, requires_grad=True)
@@ -179,13 +189,13 @@ def depth_aware_smooth_loss(invDepth, rgb_image, depth_mask=None, gamma=0.001):
     # Check for NaN or inf values in input
     if torch.isnan(invDepth).any() or torch.isinf(invDepth).any():
         return torch.tensor(0.0, device=invDepth.device, requires_grad=True)
-    
+
     # More conservative clamping for numerical stability
     invDepth_clamped = torch.clamp(invDepth, min=0.01, max=100.0)
-    
+
     # Recover depth from inverse depth (for weight calculation)
     depth = (1.0 / invDepth_clamped)
-    
+
     # Check for NaN after depth calculation
     if torch.isnan(depth).any() or torch.isinf(depth).any():
         return torch.tensor(0.0, device=invDepth.device, requires_grad=True)
@@ -217,7 +227,7 @@ def depth_aware_smooth_loss(invDepth, rgb_image, depth_mask=None, gamma=0.001):
     # Weighted smoothness terms
     smooth_x = weight_dx * torch.abs(invdepth_dx) / rgb_dx_norm
     smooth_y = weight_dy * torch.abs(invdepth_dy) / rgb_dy_norm
-    
+
     # Check for NaN in smoothness terms
     if torch.isnan(smooth_x).any() or torch.isnan(smooth_y).any():
         return torch.tensor(0.0, device=invDepth.device, requires_grad=True)
@@ -233,11 +243,11 @@ def depth_aware_smooth_loss(invDepth, rgb_image, depth_mask=None, gamma=0.001):
         # More stable division
         mask_dx_sum = torch.clamp(mask_dx.sum(), min=1e-6)
         mask_dy_sum = torch.clamp(mask_dy.sum(), min=1e-6)
-        
+
         loss = (smooth_x.sum() / mask_dx_sum + smooth_y.sum() / mask_dy_sum)
     else:
         loss = smooth_x.mean() + smooth_y.mean()
-    
+
     # Final NaN check
     if torch.isnan(loss) or torch.isinf(loss):
         return torch.tensor(0.0, device=invDepth.device, requires_grad=True)

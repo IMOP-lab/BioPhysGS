@@ -1,3 +1,13 @@
+#
+# Copyright (C) 2023, Inria
+# GRAPHDECO research group, https://team.inria.fr/graphdeco
+# All rights reserved.
+#
+# This software is free for non-commercial, research and evaluation use
+# under the terms of the LICENSE.md file.
+#
+# For inquiries contact  george.drettakis@inria.fr
+#
 
 import torch
 from torch import nn
@@ -35,7 +45,7 @@ class Camera(nn.Module):
         self.alpha_mask = None
         if resized_image_rgb.shape[0] == 4:
             self.alpha_mask = resized_image_rgb[3:4, ...].to(self.data_device)
-        else: 
+        else:
             self.alpha_mask = torch.ones_like(resized_image_rgb[0:1, ...].to(self.data_device))
 
         if train_test_exp and is_test_view:
@@ -60,7 +70,7 @@ class Camera(nn.Module):
             #     if depth_params["scale"] < 0.2 * depth_params["med_scale"] or depth_params["scale"] > 5 * depth_params["med_scale"]:
             #         self.depth_reliable = False
             #         self.depth_mask *= 0
-                
+
             #     if depth_params["scale"] > 0:
             #         self.invdepthmap = self.invdepthmap * depth_params["scale"] + depth_params["offset"]
 
@@ -82,11 +92,11 @@ class Camera(nn.Module):
 
         self.canny_mask = image2canny(self.original_image.permute(1, 2, 0), 50, 150, isEdge1=False).detach().to(
             self.data_device)
-        
+
 class MiniCam:
     def __init__(self, width, height, fovy, fovx, znear, zfar, world_view_transform, full_proj_transform):
         self.image_width = width
-        self.image_height = height    
+        self.image_height = height
         self.FoVy = fovy
         self.FoVx = fovx
         self.znear = znear
@@ -97,4 +107,3 @@ class MiniCam:
         self.camera_center = view_inv[3][:3]
         self.projection_matrix = torch.bmm(self.world_view_transform.unsqueeze(0).inverse(),
                                            self.full_proj_transform.unsqueeze(0)).squeeze(0)
-

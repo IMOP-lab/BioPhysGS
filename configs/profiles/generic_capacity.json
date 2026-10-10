@@ -1,0 +1,9 @@
+{
+  "profile": "generic_capacity",
+  "code_directory": ".",
+  "iterations": 30000,
+  "flags": [
+    "--generic_capacity_control"
+  ],
+  "evaluation_protocol": "legacy"
+}

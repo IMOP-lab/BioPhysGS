@@ -1,0 +1,12 @@
+{
+  "profile": "all_losses_off",
+  "code_directory": ".",
+  "iterations": 30000,
+  "flags": [
+    "--disable_smooth",
+    "--disable_tv",
+    "--disable_depth_alignment",
+    "--disable_scale"
+  ],
+  "evaluation_protocol": "legacy"
+}

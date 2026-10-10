@@ -1,5 +1,16 @@
-﻿
+#
+# Copyright (C) 2023, Inria
+# GRAPHDECO research group, https://team.inria.fr/graphdeco
+# All rights reserved.
+#
+# This software is free for non-commercial, research and evaluation use
+# under the terms of the LICENSE.md file.
+#
+# For inquiries contact  george.drettakis@inria.fr
+#
+
 import os
+import json
 import torch
 import torch.nn.functional as F
 from random import randint
@@ -24,8 +35,10 @@ except ImportError:
 try:
     from fused_ssim import fused_ssim
     FUSED_SSIM_AVAILABLE = True
-except ImportError:
+except:
     FUSED_SSIM_AVAILABLE = False
+
+FUSED_SSIM_AVAILABLE = False
 
 try:
     from diff_gaussian_rasterization import SparseGaussianAdam
@@ -45,9 +58,22 @@ def training(dataset, opt, pipe, testing_iterations, saving_iterations, checkpoi
 
     first_iter = 0
     tb_writer = prepare_output_and_logger(dataset)
-    gaussians = GaussianModel(dataset.sh_degree, opt.optimizer_type, opt.embedding_dims)
+    with open(os.path.join(dataset.model_path, "experiment_config.json"), "w") as config_file:
+        json.dump({"optimization": vars(opt), "pipeline": vars(pipe)}, config_file, indent=2)
+    gaussians = GaussianModel(dataset.sh_degree, opt.optimizer_type)
     scene = Scene(dataset, gaussians)
     train_num = len(scene.getTrainCameras())
+
+    gaussians.embeddings = torch.nn.Sequential(
+        torch.nn.Linear(108, 128),
+        torch.nn.ReLU(),
+        torch.nn.Linear(128, opt.embedding_dims),
+    ).cuda()
+    gaussians.set_physical_parameter_initial_values(
+        light_distance_factor=opt.light_distance_factor_init,
+        tissue_scattering_length=opt.tissue_scattering_length_init,
+        absorption_coefficient=opt.absorption_coefficient_init,
+    )
     gaussians.training_setup(opt)
     if checkpoint:
         (model_params, first_iter) = torch.load(checkpoint)
@@ -97,6 +123,8 @@ def training(dataset, opt, pipe, testing_iterations, saving_iterations, checkpoi
         if (iteration - 1) == debug_from:
             pipe.debug = True
 
+        torch.autograd.set_detect_anomaly(True)
+
         bg = torch.rand((3), device="cuda") if opt.random_background else background
 
         render_pkg = render(viewpoint_cam, gaussians, pipe, bg, use_trained_exp=dataset.train_test_exp,
@@ -112,16 +140,16 @@ def training(dataset, opt, pipe, testing_iterations, saving_iterations, checkpoi
 
         # Loss
         gt_image = viewpoint_cam.original_image.cuda()
-        
+
         # Clamp images to prevent extreme values that could cause NaN in SSIM
         image = torch.clamp(image, 0.0, 1.0)
         gt_image = torch.clamp(gt_image, 0.0, 1.0)
-        
+
         # Check for NaN in rendered image before loss calculation
         if torch.isnan(image).any() or torch.isinf(image).any():
             print(f"Warning: NaN detected in rendered image at iteration {iteration}")
             image = torch.nan_to_num(image, nan=0.0, posinf=1.0, neginf=0.0)
-        
+
         Ll1 = l1_loss(image, gt_image)
         if FUSED_SSIM_AVAILABLE:
             ssim_value = fused_ssim(image.unsqueeze(0), gt_image.unsqueeze(0))
@@ -131,87 +159,72 @@ def training(dataset, opt, pipe, testing_iterations, saving_iterations, checkpoi
         loss = (1.0 - opt.lambda_dssim) * Ll1 + opt.lambda_dssim * (1.0 - ssim_value)
 
 
-        # # Depth regularization
-        # Ll1depth_pure = 0.0
-        # if depth_l1_weight(iteration) > 0 and viewpoint_cam.depth_reliable and iteration > opt.tv_from_iter:
-        #     invDepth = render_pkg["depth"]
-        #     mono_invdepth = viewpoint_cam.invdepthmap.cuda()
-        #     depth_mask = viewpoint_cam.depth_mask.cuda()
-        #     Ll1depth_pure = torch.abs((invDepth - mono_invdepth) * depth_mask).mean()
-        #     Ll1depth = 0.1 * Ll1depth_pure
-
-
-
-        # Depth regularization
+        # Depth regularization. For E2/E3 comparability the depth scheduler is
+        # still only an enable check; its numeric value is not a loss weight.
         Ll1depth_pure = 0.0
+        Ll1depth = 0
+        depth_reliable = viewpoint_cam.depth_reliable
+        invDepth = render_pkg["depth"]
+        depth_mask = viewpoint_cam.depth_mask.cuda() if depth_reliable else None
 
-        if depth_l1_weight(iteration) > 0 and viewpoint_cam.depth_reliable and iteration > opt.tv_from_iter:
-            invDepth = render_pkg["depth"]
-            mono_invdepth = viewpoint_cam.invdepthmap.cuda()
-
-            # print(invDepth.shape, mono_invdepth.shape)  
-            depth_mask = viewpoint_cam.depth_mask.cuda()
-            
-            # 浼樺寲鐨勬繁搴︽崯澶辫绠?            # 1. 杞崲閫嗘繁搴︿负娣卞害锛堢背锛?            epsilon = 1e-6
-
-            rendered_depth = 1.0 / (invDepth + epsilon)
-            gt_depth_m = mono_invdepth  # GT娣卞害
-            # rendered_depth = 1.0 / (invDepth + epsilon)  # 娓叉煋娣卞害
-            # gt_depth_m = 1.0 / (mono_invdepth + epsilon)  # GT娣卞害
-
-
-            # 2. 鍒涘缓鏈夋晥鎺╃爜 - GT娣卞害 > 0.01m 鎰忓懗鐫€蹇界暐澶繎鐨勭偣锛屽鍔犵ǔ瀹氭€?            mask = (gt_depth_m > 0.005) & (rendered_depth > 0) & (depth_mask > 0)
-            
-            # 濡傛灉娌℃湁鏈夋晥鐨勯噸鍙犲尯鍩燂紝鍒欎笉璁＄畻鎹熷け
+        if (not opt.disable_depth_alignment and depth_l1_weight(iteration) > 0
+                and depth_reliable and iteration > opt.depth_from_iter):
+            gt_depth_m = viewpoint_cam.invdepthmap.cuda()
+            rendered_depth = 1.0 / (invDepth + 1e-6)
+            mask = (gt_depth_m > 0.005) & (rendered_depth > 0) & (depth_mask > 0)
             if not torch.any(mask):
                 Ll1depth_pure = torch.tensor(0.0, device=rendered_depth.device)
             else:
-                # 3. 鎻愬彇鏈夋晥娣卞害鍊?                rendered_masked = torch.masked_select(rendered_depth, mask)
+                rendered_masked = torch.masked_select(rendered_depth, mask)
                 gt_masked = torch.masked_select(gt_depth_m, mask)
-                
-                # 4. 璁＄畻灏哄害鍥犲瓙骞跺榻?                # 浣跨敤 .detach() 鏉ラ樆姝㈡搴︽祦缁忚繖涓榻愯繃绋?                scale_factor = (torch.median(gt_masked) / torch.median(rendered_masked)).detach()
+                scale_factor = (torch.median(gt_masked) / torch.median(rendered_masked)).detach()
                 rendered_depth_aligned = rendered_depth * scale_factor
-                
-                # 5. 璁＄畻鎹熷け
                 Ll1depth_pure = torch.nn.functional.l1_loss(
-                    rendered_depth_aligned[mask], 
-                    gt_depth_m[mask]
+                    rendered_depth_aligned[mask], gt_depth_m[mask]
                 )
-            Ll1depth = 1.0 * Ll1depth_pure
+            depth_factor = opt.depth_loss_multiplier
+            if opt.apply_depth_scheduler:
+                depth_factor *= depth_l1_weight(iteration)
+            loss += depth_factor * Ll1depth_pure
+            Ll1depth = Ll1depth_pure.item()
 
-
-
-            rgb_image = render_pkg["render"]
-            smooth_weight = 0.01
-            Lsmooth = smooth_weight * depth_aware_smooth_loss(
-                invDepth,
-                rgb_image,
-                depth_mask,
-                gamma=0.001
+        if (not opt.disable_smooth and depth_reliable
+                and iteration > opt.smooth_from_iter):
+            progress = min(max(iteration / opt.iterations, 0.0), 1.0)
+            if opt.smooth_weight_init > 0 and opt.smooth_weight_final > 0:
+                current_smooth_weight = opt.smooth_weight_init * (
+                    opt.smooth_weight_final / opt.smooth_weight_init
+                ) ** progress
+            else:
+                current_smooth_weight = (
+                    opt.smooth_weight_init
+                    + (opt.smooth_weight_final - opt.smooth_weight_init) * progress
+                )
+            loss += current_smooth_weight * depth_aware_smooth_loss(
+                invDepth, render_pkg["render"], depth_mask, gamma=0.001
             )
 
-            loss += Ll1depth + Lsmooth
+        if (not opt.disable_tv and opt.lambda_tv and iteration > opt.tv_from_iter
+                and iteration < opt.tv_until_iter and depth_reliable):
+            loss += opt.lambda_tv * anisotropic_total_variation_loss(invDepth.squeeze())
 
-            Ll1depth = Ll1depth.item()
-
-        else:
-            Ll1depth = 0
-
-
-        if opt.lambda_tv and iteration > opt.tv_from_iter and iteration < opt.tv_until_iter and viewpoint_cam.depth_reliable:
-            normalize_depth = lambda x: (x - x.min()) / (x.max() - x.min())
-            depth = normalize_depth(render_pkg["depth"])
-            tv = anisotropic_total_variation_loss(depth.squeeze())
-            loss += opt.lambda_tv * tv
-        
         # scale loss
-        if visibility_filter.sum() > 0:
+
+
+
+        if (not opt.disable_scale and iteration > opt.scale_from_iter
+                and visibility_filter.sum() > 0):
             scale = gaussians.get_scaling[visibility_filter]
             sorted_scale, _ = torch.sort(scale, dim=-1)
-            min_scale_loss = sorted_scale[..., 0]
+                        # 建议修改
+            threshold = 0.0001
+            min_scale_loss = torch.clamp(threshold - sorted_scale[..., 0], min=0)
             loss += opt.scale_loss_weight * min_scale_loss.mean()
 
+
         # Backprop
+
+        torch.autograd.set_detect_anomaly(True)
 
         loss.backward()
 
@@ -247,13 +260,26 @@ def training(dataset, opt, pipe, testing_iterations, saving_iterations, checkpoi
 
                 # Densification
                 if iteration > opt.densify_from_iter and iteration % opt.densification_interval == 0:
-                    size_threshold = 20 if iteration > opt.opacity_reset_interval else None
-                    gaussians.densify_and_prune(opt.densify_grad_threshold, opt.densify_grad_abs_threshold, 0.005, scene.cameras_extent, size_threshold, radii)
+                    # ``disable_pruning`` must not disable clone/split
+                    # densification.  The previous guard skipped the entire
+                    # routine and left the model at its sparse initialization
+                    # size for all 30k iterations.
+                    disable_pruning = getattr(opt, 'disable_pruning', False)
+                    size_threshold = None if disable_pruning else (20 if iteration > opt.opacity_reset_interval else None)
+                    min_opacity = 0.0 if disable_pruning else 0.005
+                    gaussians.densify_and_prune(
+                        opt.densify_grad_threshold,
+                        opt.densify_grad_abs_threshold,
+                        min_opacity,
+                        scene.cameras_extent,
+                        size_threshold,
+                        radii,
+                    )
 
-                if iteration % opt.opacity_reduce_interval == 0 and opt.use_reduce:
+                if iteration % opt.opacity_reduce_interval == 0 and opt.use_reduce and not getattr(opt, 'disable_reduce', False):
                     gaussians.reduce_opacity()
 
-                if iteration % opt.opacity_reset_interval == 0 or (dataset.white_background and iteration == opt.densify_from_iter):
+                if (not getattr(opt, 'disable_opacity_reset', False)) and (iteration % opt.opacity_reset_interval == 0 or (dataset.white_background and iteration == opt.densify_from_iter)):
                     gaussians.reset_opacity()
 
 
@@ -299,6 +325,14 @@ def training(dataset, opt, pipe, testing_iterations, saving_iterations, checkpoi
             except Exception as e:
                 # raise e
                 network_gui.conn = None
+
+    physical_parameters = {
+        "light_distance_factor": gaussians.bs_model.light_distance_factor.detach().cpu().tolist(),
+        "tissue_scattering_length": gaussians.da_model.tissue_scattering_length.detach().cpu().tolist(),
+        "absorption_coefficient": gaussians.da_model.absorption_coefficient.detach().cpu().tolist(),
+    }
+    with open(os.path.join(dataset.model_path, "physical_parameters_final.json"), "w") as parameter_file:
+        json.dump(physical_parameters, parameter_file, indent=2)
 
 
 def prepare_output_and_logger(args):
@@ -380,6 +414,7 @@ if __name__ == "__main__":
     parser.add_argument('--port', type=int, default=6009)
     parser.add_argument('--debug_from', type=int, default=1)
     parser.add_argument('--detect_anomaly', action='store_true', default=False)
+    parser.add_argument('--seed', type=int, default=0)
     parser.add_argument("--test_iterations", nargs="+", type=int, default=[3000, 7000, 10000,20000, 30000])
     parser.add_argument("--save_iterations", nargs="+", type=int, default=[3000, 7000, 10000,20000, 30000])
     parser.add_argument("--quiet", action="store_true")
@@ -394,7 +429,7 @@ if __name__ == "__main__":
     print("Optimizing " + args.model_path)
 
     # Initialize system state (RNG)
-    safe_state(args.quiet)
+    safe_state(args.quiet, args.seed)
 
     # Start GUI server, configure and run training
     if not args.disable_viewer:

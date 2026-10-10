@@ -1,0 +1,9 @@
+{
+  "profile": "no_layers",
+  "code_directory": ".",
+  "iterations": 30000,
+  "flags": [
+    "--disable_dual_layer"
+  ],
+  "evaluation_protocol": "legacy"
+}

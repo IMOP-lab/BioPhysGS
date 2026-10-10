@@ -1,0 +1,18 @@
+{
+  "biophysgs_dav2_vitb.pt": {
+    "component": "depth",
+    "bytes": 389981048,
+    "sha256": "de2a29de72e34bd2ff9ea0a14e99351ccdaa5331c53064deca811f2a0f5193cc",
+    "tensor_sha256": "4b4fa5bd04a3ce8ab0ce348b8768fae4860526ae20675bfc74f53de8c2be1c3e",
+    "url": "https://github.com/IMOP-lab/BioPhysGS/releases/download/v0.1.0/biophysgs_dav2_vitb.pt",
+    "architecture": "FineTunedDAV2 vitb",
+    "license": "CC-BY-NC-4.0 for ViT-B model weights"
+  },
+  "droidcalib.pth": {
+    "component": "initializer",
+    "bytes": 16049525,
+    "sha256": "67c5b78f727fb5ea7a6bf31fafe2f20c8982a56ca0b4f880ab46769a244b0a6f",
+    "url": "https://github.com/IMOP-lab/BioPhysGS/releases/download/v0.1.0/droidcalib.pth",
+    "license": "See initialization/LICENSE and upstream DroidCalib notices"
+  }
+}

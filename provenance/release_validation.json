@@ -1,0 +1,714 @@
+{
+  "python": "3.10.18",
+  "torch": "2.1.0+cu118",
+  "torch_cuda": "11.8",
+  "gpu": "NVIDIA GeForce RTX 3080",
+  "dependencies": {
+    "torchvision": "0.16.0+cu118",
+    "tinycudann": "2.0",
+    "numpy": "1.26.4",
+    "Pillow": "11.0.0",
+    "opencv-python": "4.12.0.88",
+    "lpips": "0.1.4",
+    "scipy": "1.15.3"
+  },
+  "extension_builds": [
+    {
+      "package": "diff-gaussian-rasterization",
+      "exit_code": 0
+    },
+    {
+      "package": "simple-knn",
+      "exit_code": 0
+    },
+    {
+      "package": "fused-ssim",
+      "exit_code": 0
+    }
+  ],
+  "runs": {
+    "full": {
+      "status": "completed",
+      "iterations": 600,
+      "seed": 0,
+      "completed_stages": [
+        "train",
+        "render",
+        "evaluate"
+      ],
+      "evaluation": {
+        "views": 2,
+        "protocol": "legacy",
+        "lpips_backbone": "vgg",
+        "lpips_input_normalized": false,
+        "PSNR": 32.38859881001672,
+        "SSIM": 0.9762642085552216,
+        "LPIPS": 0.04520189389586449
+      },
+      "saved_files": [
+        {
+          "path": "cfg_args",
+          "bytes": 401
+        },
+        {
+          "path": "input.ply",
+          "bytes": 34792
+        },
+        {
+          "path": "point_cloud/iteration_600/model_weights.pth",
+          "bytes": 186462
+        },
+        {
+          "path": "point_cloud/iteration_600/point_cloud.ply",
+          "bytes": 318969
+        }
+      ],
+      "post_warmup_depth_loss_present": true
+    },
+    "hamlyn": {
+      "status": "completed",
+      "iterations": 600,
+      "seed": 0,
+      "completed_stages": [
+        "train",
+        "render",
+        "evaluate"
+      ],
+      "evaluation": {
+        "views": 2,
+        "protocol": "legacy",
+        "lpips_backbone": "vgg",
+        "lpips_input_normalized": false,
+        "PSNR": 35.06525035631195,
+        "SSIM": 0.985690176486969,
+        "LPIPS": 0.026645250618457794
+      },
+      "saved_files": [
+        {
+          "path": "cfg_args",
+          "bytes": 406
+        },
+        {
+          "path": "input.ply",
+          "bytes": 34792
+        },
+        {
+          "path": "point_cloud/iteration_600/model_weights.pth",
+          "bytes": 186462
+        },
+        {
+          "path": "point_cloud/iteration_600/point_cloud.ply",
+          "bytes": 318969
+        }
+      ],
+      "post_warmup_depth_loss_present": true
+    }
+  },
+  "depth_inference": {
+    "files": 1,
+    "shape": [
+      475,
+      475
+    ],
+    "dtype": "float16",
+    "finite": true,
+    "min": 0.1004638671875,
+    "max": 0.2283935546875
+  },
+  "tinycudann_source": {
+    "subdirectory": "bindings/torch",
+    "url": "https://github.com/NVlabs/tiny-cuda-nn/",
+    "vcs_info": {
+      "commit_id": "3f6ef958edd4c5ab4d894b6e4813839cc809457c",
+      "vcs": "git"
+    }
+  },
+  "release_version": "0.1.0",
+  "date": "2026-10-10",
+  "scope": "Software validation on a procedural 16-frame fixture; this does not re-run all paper experiments.",
+  "cuda_build_scope": "Three vendored extensions built independently in an isolated target directory; PyTorch and tiny-cuda-nn use the recorded installed environment.",
+  "initializer_validation": {
+    "entrypoint_help": "pass",
+    "environment": "Python 3.10, PyTorch 2.5.1+cu121, recorded installed droid_backends/lietorch",
+    "fresh_initializer_build": false,
+    "full_tracking_and_export_rerun": false
+  },
+  "static_validation": {
+    "python_syntax": "pass",
+    "profile_command_plans": 12,
+    "bash_syntax": "pass",
+    "release_authored_whitespace": "pass",
+    "upstream_cpp_and_license_formatting_preserved": true,
+    "credential_scan_files": 850,
+    "credential_scan": "pass"
+  },
+  "source_equivalence": {
+    "comparisons": [
+      {
+        "source_path": "formal/metrics.py",
+        "release_path": "metrics.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "formal/render.py",
+        "release_path": "render.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "formal/convert.py",
+        "release_path": "convert.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "formal/train.py",
+        "release_path": "train.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "formal/render_video.py",
+        "release_path": "render_video.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "formal/lpipsPyTorch/__init__.py",
+        "release_path": "lpipsPyTorch/__init__.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "formal/lpipsPyTorch/modules/networks.py",
+        "release_path": "lpipsPyTorch/modules/networks.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "formal/lpipsPyTorch/modules/utils.py",
+        "release_path": "lpipsPyTorch/modules/utils.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "formal/lpipsPyTorch/modules/lpips.py",
+        "release_path": "lpipsPyTorch/modules/lpips.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "formal/gaussian_renderer/__init__.py",
+        "release_path": "gaussian_renderer/__init__.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "formal/gaussian_renderer/network_gui.py",
+        "release_path": "gaussian_renderer/network_gui.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "formal/utils/general_utils.py",
+        "release_path": "utils/general_utils.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "formal/utils/image_utils.py",
+        "release_path": "utils/image_utils.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "formal/utils/sh_utils.py",
+        "release_path": "utils/sh_utils.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "formal/utils/camera_utils.py",
+        "release_path": "utils/camera_utils.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "formal/utils/white_balance.py",
+        "release_path": "utils/white_balance.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "formal/utils/system_utils.py",
+        "release_path": "utils/system_utils.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "formal/utils/read_write_model.py",
+        "release_path": "utils/read_write_model.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "formal/utils/graphics_utils.py",
+        "release_path": "utils/graphics_utils.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "formal/utils/make_depth_scale.py",
+        "release_path": "utils/make_depth_scale.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "formal/utils/loss_utils.py",
+        "release_path": "utils/loss_utils.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "formal/submodules/simple-knn/setup.py",
+        "release_path": "submodules/simple-knn/setup.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "formal/submodules/diff-gaussian-rasterization/setup.py",
+        "release_path": "submodules/diff-gaussian-rasterization/setup.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "formal/submodules/diff-gaussian-rasterization/diff_gaussian_rasterization/__init__.py",
+        "release_path": "submodules/diff-gaussian-rasterization/diff_gaussian_rasterization/__init__.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "formal/submodules/fused-ssim/setup.py",
+        "release_path": "submodules/fused-ssim/setup.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "formal/submodules/fused-ssim/tests/train_image.py",
+        "release_path": "submodules/fused-ssim/tests/train_image.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "formal/submodules/fused-ssim/tests/test.py",
+        "release_path": "submodules/fused-ssim/tests/test.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "formal/submodules/fused-ssim/tests/genplot.py",
+        "release_path": "submodules/fused-ssim/tests/genplot.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "formal/submodules/fused-ssim/fused_ssim/__init__.py",
+        "release_path": "submodules/fused-ssim/fused_ssim/__init__.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "formal/scene/encoding.py",
+        "release_path": "scene/encoding.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "formal/scene/__init__.py",
+        "release_path": "scene/__init__.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "formal/scene/colmap_loader.py",
+        "release_path": "scene/colmap_loader.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "formal/scene/appearace_model.py",
+        "release_path": "scene/appearace_model.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "formal/scene/cameras.py",
+        "release_path": "scene/cameras.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "formal/scene/dataset_readers.py",
+        "release_path": "scene/dataset_readers.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "formal/scene/endoscope_model.py",
+        "release_path": "scene/endoscope_model.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "formal/scene/gaussian_model.py",
+        "release_path": "scene/gaussian_model.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "formal/arguments/__init__.py",
+        "release_path": "arguments/__init__.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "hamlyn/metrics.py",
+        "release_path": "variants/hamlyn/metrics.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "hamlyn/render.py",
+        "release_path": "variants/hamlyn/render.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "hamlyn/train.py",
+        "release_path": "variants/hamlyn/train.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "hamlyn/lpipsPyTorch/__init__.py",
+        "release_path": "variants/hamlyn/lpipsPyTorch/__init__.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "hamlyn/lpipsPyTorch/modules/networks.py",
+        "release_path": "variants/hamlyn/lpipsPyTorch/modules/networks.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "hamlyn/lpipsPyTorch/modules/utils.py",
+        "release_path": "variants/hamlyn/lpipsPyTorch/modules/utils.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "hamlyn/lpipsPyTorch/modules/lpips.py",
+        "release_path": "variants/hamlyn/lpipsPyTorch/modules/lpips.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "hamlyn/gaussian_renderer/__init__.py",
+        "release_path": "variants/hamlyn/gaussian_renderer/__init__.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "hamlyn/gaussian_renderer/network_gui.py",
+        "release_path": "variants/hamlyn/gaussian_renderer/network_gui.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "hamlyn/utils/general_utils.py",
+        "release_path": "variants/hamlyn/utils/general_utils.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "hamlyn/utils/image_utils.py",
+        "release_path": "variants/hamlyn/utils/image_utils.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "hamlyn/utils/sh_utils.py",
+        "release_path": "variants/hamlyn/utils/sh_utils.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "hamlyn/utils/camera_utils.py",
+        "release_path": "variants/hamlyn/utils/camera_utils.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "hamlyn/utils/white_balance.py",
+        "release_path": "variants/hamlyn/utils/white_balance.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "hamlyn/utils/system_utils.py",
+        "release_path": "variants/hamlyn/utils/system_utils.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "hamlyn/utils/read_write_model.py",
+        "release_path": "variants/hamlyn/utils/read_write_model.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "hamlyn/utils/graphics_utils.py",
+        "release_path": "variants/hamlyn/utils/graphics_utils.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "hamlyn/utils/make_depth_scale.py",
+        "release_path": "variants/hamlyn/utils/make_depth_scale.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "hamlyn/utils/loss_utils.py",
+        "release_path": "variants/hamlyn/utils/loss_utils.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "hamlyn/scene/encoding.py",
+        "release_path": "variants/hamlyn/scene/encoding.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "hamlyn/scene/__init__.py",
+        "release_path": "variants/hamlyn/scene/__init__.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "hamlyn/scene/colmap_loader.py",
+        "release_path": "variants/hamlyn/scene/colmap_loader.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "hamlyn/scene/appearace_model.py",
+        "release_path": "variants/hamlyn/scene/appearace_model.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "hamlyn/scene/cameras.py",
+        "release_path": "variants/hamlyn/scene/cameras.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "hamlyn/scene/dataset_readers.py",
+        "release_path": "variants/hamlyn/scene/dataset_readers.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "hamlyn/scene/endoscope_model.py",
+        "release_path": "variants/hamlyn/scene/endoscope_model.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "hamlyn/scene/gaussian_model.py",
+        "release_path": "variants/hamlyn/scene/gaussian_model.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "hamlyn/arguments/__init__.py",
+        "release_path": "variants/hamlyn/arguments/__init__.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "depth/train_depthany.py",
+        "release_path": "depth_prior/train_depthany.py",
+        "executable_ast_preserved": false
+      },
+      {
+        "source_path": "depth/depth_anything_v2_yuan/dpt.py",
+        "release_path": "depth_prior/depth_anything_v2_yuan/dpt.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "depth/depth_anything_v2_yuan/dinov2.py",
+        "release_path": "depth_prior/depth_anything_v2_yuan/dinov2.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "depth/depth_anything_v2_yuan/util/transform.py",
+        "release_path": "depth_prior/depth_anything_v2_yuan/util/transform.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "depth/depth_anything_v2_yuan/util/blocks.py",
+        "release_path": "depth_prior/depth_anything_v2_yuan/util/blocks.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "depth/depth_anything_v2_yuan/dinov2_layers/attention.py",
+        "release_path": "depth_prior/depth_anything_v2_yuan/dinov2_layers/attention.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "depth/depth_anything_v2_yuan/dinov2_layers/swiglu_ffn.py",
+        "release_path": "depth_prior/depth_anything_v2_yuan/dinov2_layers/swiglu_ffn.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "depth/depth_anything_v2_yuan/dinov2_layers/__init__.py",
+        "release_path": "depth_prior/depth_anything_v2_yuan/dinov2_layers/__init__.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "depth/depth_anything_v2_yuan/dinov2_layers/layer_scale.py",
+        "release_path": "depth_prior/depth_anything_v2_yuan/dinov2_layers/layer_scale.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "depth/depth_anything_v2_yuan/dinov2_layers/mlp.py",
+        "release_path": "depth_prior/depth_anything_v2_yuan/dinov2_layers/mlp.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "depth/depth_anything_v2_yuan/dinov2_layers/patch_embed.py",
+        "release_path": "depth_prior/depth_anything_v2_yuan/dinov2_layers/patch_embed.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "depth/depth_anything_v2_yuan/dinov2_layers/block.py",
+        "release_path": "depth_prior/depth_anything_v2_yuan/dinov2_layers/block.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "depth/depth_anything_v2_yuan/dinov2_layers/drop_path.py",
+        "release_path": "depth_prior/depth_anything_v2_yuan/dinov2_layers/drop_path.py",
+        "executable_ast_preserved": true
+      },
+      {
+        "source_path": "depth/Data/dataloaders.py",
+        "release_path": "depth_prior/Data/dataloaders.py",
+        "executable_ast_preserved": false
+      },
+      {
+        "source_path": "depth/Data/dataset.py",
+        "release_path": "depth_prior/Data/dataset.py",
+        "executable_ast_preserved": true
+      }
+    ],
+    "explicit_portability_edits": [
+      "depth_prior/train_depthany.py",
+      "depth_prior/Data/dataloaders.py"
+    ],
+    "note": "Executable AST comparison excludes string-only expressions and preserves numerical model/training code. Depth edits replace private paths/pretrained argument, remove a path diagnostic, and restrict the helper to its supplied Depth Anything architecture."
+  },
+  "weights": {
+    "biophysgs_dav2_vitb.pt": {
+      "bytes": 389981048,
+      "sha256": "de2a29de72e34bd2ff9ea0a14e99351ccdaa5331c53064deca811f2a0f5193cc",
+      "tensor_sha256": "4b4fa5bd04a3ce8ab0ce348b8768fae4860526ae20675bfc74f53de8c2be1c3e",
+      "inference_tensors_identical_to_experimental_checkpoint": true,
+      "optimizer_state_removed": true
+    },
+    "droidcalib.pth": {
+      "bytes": 16049525,
+      "sha256": "67c5b78f727fb5ea7a6bf31fafe2f20c8982a56ca0b4f880ab46769a244b0a6f"
+    }
+  },
+  "file_sha256": {
+    "arguments/__init__.py": "7dd8c3caf93486685179cad78b66624aef497c932ad5e7c98b13b815cb7b7184",
+    "configs/profiles/all_losses_off.json": "395f531c9c36a0bd4ec5b186127ef7a5b781fd109fc6967a114c92952958fc41",
+    "configs/profiles/endomapper.json": "59b5ccb7868d03d7bbb9d15852cc0609d1548e12d1a4718c76c1078ef511a7f6",
+    "configs/profiles/full.json": "0a1b87aae98ab480a5deceb139b540c1cb67e2eba84d1b3f02d0d4ba08d84360",
+    "configs/profiles/generic_capacity.json": "ad0834357086edd0c045762dc0b92b36370849c583df1b24165893075850df0e",
+    "configs/profiles/hamlyn.json": "f89a4e485e58c82f76d3b78e79b4ebb7b8fe0dbbccdb66b9fd82136045215d32",
+    "configs/profiles/no_depth.json": "93345b96e25b08caa03edada9e96b2436c891a496cb18c4d2eb04b3a950331e6",
+    "configs/profiles/no_field.json": "ed1a8ae5049cb3cf04467ea1e3c0d5ba9132e4319154746b4826f3125c48cd32",
+    "configs/profiles/no_field_and_layers.json": "667cfbebd93873008a66f5e1233755e452a777a414e960515b9585ffa71a30c7",
+    "configs/profiles/no_layers.json": "2f7f78846d58683366fb31a798d8420f31c529cad85b9364cd41df9902c9da0f",
+    "configs/profiles/no_scale.json": "a2515ec05a79734b732b0e139f8ef1c216be797fa17d2d838b22ba04336eb8d4",
+    "configs/profiles/no_smooth.json": "df642ef5718b562cd2ec606b26fcb3ac4ee57d5680b2dc0f5b2d8efb7f9073c0",
+    "configs/profiles/no_tv.json": "c443365e7862c771cf69d01cd0b0f0987cef6670300536581dc3bbeefa6ae067",
+    "configs/recorded_hamlyn/Z1.json": "d62dcf2c3d1cff7109236b58201dd7bbd4725f31383af7e5e4927b9f11937a04",
+    "configs/recorded_hamlyn/Z2.json": "0a98233066f54b32016effe8d52853e7bfa1c8ffb3e44eb4cb29be58f7288bd0",
+    "configs/recorded_hamlyn/Z3.json": "0997a416334e4ef1a004f632cd5f6986efaa19869b8af8c1e8986c095fe83fb0",
+    "configs/weights.json": "ab7d2d60dff47921d2ab1f78c25b59f9f0df6ca53c125bd1602a04f1a3b83824",
+    "convert.py": "e534a5f64425412dc7a1ae4360f8caf3421167984bbaca307916d8a40ba16b64",
+    "depth_prior/depth_anything_v2_yuan/dinov2.py": "8733a08b6c9f45b550c1dfbf1b27fc730a84a87e509ba2746ae0d24b47322783",
+    "depth_prior/depth_anything_v2_yuan/dinov2_layers/__init__.py": "e3c28c7b775165b6844000eb69f44d104d6c3803ac7da5d59f6ac3ecfb46d9d8",
+    "depth_prior/depth_anything_v2_yuan/dinov2_layers/attention.py": "4cd09fb41a118baa032807aa78d303ce6b628dfec5dc055924d88d80790e314d",
+    "depth_prior/depth_anything_v2_yuan/dinov2_layers/block.py": "093266ea08084c7cce7b8ddd779ecfaaa13055735faa8a7d68b5924f385b395b",
+    "depth_prior/depth_anything_v2_yuan/dinov2_layers/drop_path.py": "949100aac4d9c19c9d65319dbd362886c5d46a72d7586ba4fd500e9f1d51570c",
+    "depth_prior/depth_anything_v2_yuan/dinov2_layers/layer_scale.py": "356817b5d1390737128cbcc03a5333fd3060b73beae478772282ccb851d0ef85",
+    "depth_prior/depth_anything_v2_yuan/dinov2_layers/mlp.py": "c18c5b3f021408597a473bb710070ec3fb3b39f5a2e42e88ae83ced425a608b5",
+    "depth_prior/depth_anything_v2_yuan/dinov2_layers/patch_embed.py": "b3f82e19926c9cfb63f10136aca5e8a723bde1ad62dae1d04f90d405f9439baf",
+    "depth_prior/depth_anything_v2_yuan/dinov2_layers/swiglu_ffn.py": "df81d9901240214edc1831ce1b77558dcd6227b29a2f000fc5f546df55d2d09a",
+    "depth_prior/depth_anything_v2_yuan/dpt.py": "0bb7b913a9920a73239ec243ef4d01be387880620ed003873a9c6bfe38a298c3",
+    "depth_prior/depth_anything_v2_yuan/util/blocks.py": "192045851aab2320391afbc604cddb03faf04c15f6905dd1d772735d4acad2f5",
+    "depth_prior/depth_anything_v2_yuan/util/transform.py": "338982c3c3ad0de30220470c8f6a16662cee1e8f09064f33370ea929f3895e1a",
+    "depth_prior/predict.py": "41c5c96ef7b84d2d9fee6e025874c847f344e05dc1d4794311e524f52b644047",
+    "depth_prior/train_depthany.py": "046d40f39f0d08bcc9fdb7584b468c5bf409727a847b7fed9ed6ac358b93f015",
+    "gaussian_renderer/__init__.py": "9623df834e391b33539579758da530e0c888786254797bf5f9ef8b04f55c10f4",
+    "gaussian_renderer/network_gui.py": "84eac37b757c7cef77b699f21ea7c1242629d49d2f4260db1276b3bd77d51986",
+    "initialization/droid_slam/data_readers/__init__.py": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "initialization/droid_slam/data_readers/augmentation.py": "0daf1924a0db798359ac8178af93153731c282dee201eb28460b82a4ddf810c3",
+    "initialization/droid_slam/data_readers/base.py": "fef1e2bf256bf4d82325d97c0d0979715edc95530314ec4a860471030b4ae590",
+    "initialization/droid_slam/data_readers/factory.py": "769df45b5cd180aaa911d5749a43384ae6bac0e8c11fdd645292aa5b17888477",
+    "initialization/droid_slam/data_readers/rgbd_utils.py": "bbe98068ce0b0ecd95698cb7bb67ba2316650df248b2924312203d90698bfa87",
+    "initialization/droid_slam/data_readers/stream.py": "47bbc0366bddff809f445f7d729f027b3e2478bd130ca352d001529fbb68db3e",
+    "initialization/droid_slam/data_readers/tartan.py": "97ed35bde00d75540e5377bcd50143a86f191646366b2f6e177d9516dcbfd019",
+    "initialization/droid_slam/depth_video.py": "77db0c3238b479fa6ef777890eec804c4e7fd21d7c0a4badfbbcabb816cf6e3a",
+    "initialization/droid_slam/droid.py": "f0519a3bfcbe4a1f5c37b5dc35415541e95877fcd9140773f4f3f3fc24916463",
+    "initialization/droid_slam/droid_backend.py": "2ce1cc67bc89a6b1e16b8da343beaa8b8f8fc8cb105a6969644acc672d843df5",
+    "initialization/droid_slam/droid_frontend.py": "d8251d53965fa0ee03561d989d1f1a4864ab484ad127dd92aebf1ae9d094c42d",
+    "initialization/droid_slam/droid_net.py": "b9441c5d4865c8a8486cc523989e7d64b68cc74b947fac06edb1776b612abddd",
+    "initialization/droid_slam/factor_graph.py": "495d067c4b5b0bfbbb46384eaaccef218e84788a95e585441c22f73c87efc33f",
+    "initialization/droid_slam/geom/__init__.py": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "initialization/droid_slam/geom/ba.py": "df1a8db63f6571b1f106da1bbcd187be5fac49d6c7f726edfeef6c1c9b1d8929",
+    "initialization/droid_slam/geom/chol.py": "f104581a1e013b43e8ece962784b59b200535468209deb8081ec0c24201a184e",
+    "initialization/droid_slam/geom/graph_utils.py": "16b51c936854f000e782a6ccd75c0ec7667a9fcb78261350ccae9144d2ae0d74",
+    "initialization/droid_slam/geom/losses.py": "df048a9652fc9ab9f9644598761a4b3b738ed0f49646c7b4466421713b1e3cf6",
+    "initialization/droid_slam/geom/mapping_error.py": "57495f6ca2c5f4f96a8cfe1680874500f23ba092be68302fe7c2a356289b6c8d",
+    "initialization/droid_slam/geom/projective_ops.py": "56596bb123d5b42b3a246d2f11dea126ff5568b2795cdb9ff09c965a6b50b7fe",
+    "initialization/droid_slam/logger.py": "c743ea042abaf6a11e369696cd968fb2055a842829637fbdf92299d422401856",
+    "initialization/droid_slam/modules/__init__.py": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "initialization/droid_slam/modules/clipping.py": "b7b5b23fbc1e9cdbbb1c9c6b71b0ccf35ff75497778d08317a7d9cf3d4dbedbe",
+    "initialization/droid_slam/modules/corr.py": "4b1cd0145008e7990bda3f0f3291372f8b684e145adcd6cd5d50977785881891",
+    "initialization/droid_slam/modules/extractor.py": "a98e6501ac1ce3151ef80d353f830c14470e90522c3e018a2a9e011d14c2bb6a",
+    "initialization/droid_slam/modules/gru.py": "4d2124c8823240a9b2be456f0b072b1070d238e496ca701590d1dd60903088b1",
+    "initialization/droid_slam/motion_filter.py": "190b65703f6cba157b3d45798927096def542f09d97c87ca4e984dcd89c5e124",
+    "initialization/droid_slam/trajectory_filler.py": "435573abdb9c4302ac261849d474c961caece9952fc706a6e7a3053e2f8482cb",
+    "initialization/droid_slam/video_calib.py": "a727f69e8938bb8dde5d4316fd1163b557aad197c7eb67a7a590e2564b5673d3",
+    "initialization/droid_slam/visualization.py": "b3a8c07bfcb34fbdd7de3c94f7221605f0b20725cc32c18a6483d4c027ea0032",
+    "initialization/estimate_and_export.py": "c4f7dc6db2d05f31133d39cf49818b74a4a0836350c36adc34775a30729b86d5",
+    "initialization/extract_frames.py": "da8288dd5921d37339701fd66c9c8ff92826ab2af793d0d06fdee6b67a98b914",
+    "initialization/setup.py": "9c4223bdc2b3fd7208abab9066d78efac691e13b2bd19e66228477e24eeaab21",
+    "lpipsPyTorch/__init__.py": "f41e7c5135dfcbb4309fcc5715cbd3cc67e8202b1d52454ff7d3c7da3067138a",
+    "lpipsPyTorch/modules/lpips.py": "68d3f1647d9d04f849f17a3553f3eb4dbdf2b3164afeaf8147f0eb7e7a4ee201",
+    "lpipsPyTorch/modules/networks.py": "dfa6f152b0e3fbc23ac3bfaea52b46e9473e64ad539ea22ab030c57af51c7f14",
+    "lpipsPyTorch/modules/utils.py": "1bd4a7d4e7b43215497675ed852936fe4f27e7ea3068afe0b0e1f7cfb6c48570",
+    "metrics.py": "c52dac700758c4e782b311b2b5632bd6d6acf3787aedacfe69777d3f63c85523",
+    "render.py": "78268f97d46d2cd99165bf8a4435b9cbc4e9453b016df719c2cd4546dcb41f41",
+    "render_video.py": "1fc5847c5ef36da6ff4464c5685709e3657a3edefda383ffa59ccb1b221ac9ee",
+    "results/endomapper_12_methods.csv": "118dcbfc767e8be92f71e8aadf0c1e27f47fcf78ff281e65ca88156b6e398aae",
+    "results/hamlyn_added_baselines.csv": "a0c23872b5bc1bc23013f3bf3ebc6ca66ec1fa8a776107069b6f8ee125629461",
+    "results/hamlyn_camera_controls.csv": "c53420dc79e3dd22cb8325321890f603282573d277d36ade66c9c3de822b62f9",
+    "results/rtx3090_12_methods.csv": "db87a53df5c7b2c5e435ae104b1f007354c0255df770ac43787e743ee8ef1364",
+    "runAll.sh": "d25d341c531cbbbff67d8ff97583b7a23436095a23a67a922e020d0b124621fc",
+    "scene/__init__.py": "630bb46821bbfbab1da678d954fdcdf0c605df61d26015a7d662c357bb55c3d2",
+    "scene/appearace_model.py": "49556aa7894265faf96efba864ce2d54bca67d930afdcb5eb4d166b2961f55fa",
+    "scene/cameras.py": "5ef991f2559b09b2763f63b414b3727c71ed336c336e57eaaa8ce1464cc86487",
+    "scene/colmap_loader.py": "f3b3f6ba7cf4a17e387a1f7914468fb3e44804d09a58a6595dcc79b16e207c1a",
+    "scene/dataset_readers.py": "5a6e79f4923344de260623042aa113ecdb4678a42cfaa0b64d1bd2f3c5fed99f",
+    "scene/encoding.py": "4ab81cfbb81f01cc5f87f7c9fdbd56bb89f1247b4996d945fdeff8de327a5773",
+    "scene/endoscope_model.py": "b2db3ad3e47761b2862fe5388fd098ad6fb087a592d21ec5d010457920468ca0",
+    "scene/gaussian_model.py": "220db40b5a08edd8933905aa7523afe462a5045a1b27d42666df9770b46c09fc",
+    "scripts/download_weights.py": "94f9dc201aaaac43a503ba5907ead719774a52f285b41b16880bb070dfa38fd7",
+    "scripts/evaluate_images.py": "50cdf961ba88100c2256228f19a7cef1c1a356ce9f88c2b32301699d4de3f52f",
+    "scripts/generate_smoke_scene.py": "3310e684c060d9ee75528888bcbbb1b3a9b3ea0d28949948d06b5aa121ca605a",
+    "scripts/install_extensions.sh": "f48d163c83ce6a7b0a1fe8b4ef96fc166f769318d2f86628d012cdb66349df1e",
+    "scripts/run_experiment.py": "bac441d8e4ca056ebf8f947b80b1ed3c0f24b5b7f8efbf2073bc8fd5c446fb37",
+    "scripts/setup_initializer.sh": "0394b23a102d7ff21ef9ce0167d4d121991c61f600f3bb0613c40cbf7c0ee433",
+    "submodules/diff-gaussian-rasterization/diff_gaussian_rasterization/__init__.py": "3e8642032681d4133b2ccd32d3ec0b91f2affcf69fc917ad53b4467c6ce95f44",
+    "submodules/diff-gaussian-rasterization/setup.py": "e561d31be4fef1787d41444cf00334de6033cf5870d33c344d5d0bfcb3eb4bea",
+    "submodules/fused-ssim/fused_ssim/__init__.py": "c4a9caf98599b378050d1aa258a0b5d8b5817635bc5aefa29ab6893f442490bf",
+    "submodules/fused-ssim/setup.py": "9eea4316eb2af40e179ae6b8514f76383b7255251b83baac5a82b097c930a38e",
+    "submodules/fused-ssim/tests/genplot.py": "d7af279ec728bdb3937e6fc1145565944c935a7ae4b55c83d8b3dc8254c82c7b",
+    "submodules/fused-ssim/tests/test.py": "e56652109e65799f3ec9675fea19d17d49a0aae8522153d935a3bd0b3cab3013",
+    "submodules/fused-ssim/tests/train_image.py": "3851eb1ecf8c7f6f59cb8bcbb3b7247bbe27e552d9b44b640f9c2f12431208da",
+    "submodules/simple-knn/setup.py": "1678cf288ffe5e6b8394bd685643767fcac94092bce7980e089e98ea7200bcd2",
+    "train.py": "89edcf2f50288afd6b898c5aac87c97eddb8b16f3f7c0e6cc77178e81e9f6899",
+    "utils/camera_utils.py": "35d812c488c995b67c25ded2c0b4410ef5949c71e5dc5b18cef87755f07221d4",
+    "utils/general_utils.py": "a598df99eee3be13ecc448bb270f92b7b26f36cc5fa6275470d4e37ebeb4752b",
+    "utils/graphics_utils.py": "fcf6ebc849ce7dfd4d2fc4ab3c38a2c0a570983aa574991e95be82a7d5ef414a",
+    "utils/image_utils.py": "b32dc5340b2a693b2f1075504b4d73ea31da8471990105cf8f861cfe1d509b00",
+    "utils/loss_utils.py": "714b3668b9e06d4c2ddfb3483f6aaf7728f2e6f873c9db0131070379ab01c5a7",
+    "utils/make_depth_scale.py": "44ca560940d752924e0fa799c8e43f4679a1659431cf2b5ea6d3ba3b9bca6988",
+    "utils/read_write_model.py": "04a1f01f98bef7065e4b66baa6bef4840d42333614191fb535ce11fbfa3b0ba3",
+    "utils/sh_utils.py": "10fedc66760ae4ede61c60a3c51bede29db4cbe7c541fb090963660399a30934",
+    "utils/system_utils.py": "5a7d6ad4bdbc4d8df799fa0bd30b78ddb187c24dbb6b3c798cb1bfb8abb7dbce",
+    "utils/white_balance.py": "b6ef1987e91d9fed63bb8d9ba4b5313ed315c3f214b265f3d02e9ab5c9295ecf",
+    "variants/hamlyn/arguments/__init__.py": "4f0ad61ea0f765964e4f90e6ec57bf7f30b444d02ed84315d8413a709ca16ae3",
+    "variants/hamlyn/gaussian_renderer/__init__.py": "2bd5c81fb1d20b55fc350c83f938b821d0edd27e5c874f4261e0a7d98007770e",
+    "variants/hamlyn/gaussian_renderer/network_gui.py": "84eac37b757c7cef77b699f21ea7c1242629d49d2f4260db1276b3bd77d51986",
+    "variants/hamlyn/lpipsPyTorch/__init__.py": "f41e7c5135dfcbb4309fcc5715cbd3cc67e8202b1d52454ff7d3c7da3067138a",
+    "variants/hamlyn/lpipsPyTorch/modules/lpips.py": "68d3f1647d9d04f849f17a3553f3eb4dbdf2b3164afeaf8147f0eb7e7a4ee201",
+    "variants/hamlyn/lpipsPyTorch/modules/networks.py": "dfa6f152b0e3fbc23ac3bfaea52b46e9473e64ad539ea22ab030c57af51c7f14",
+    "variants/hamlyn/lpipsPyTorch/modules/utils.py": "1bd4a7d4e7b43215497675ed852936fe4f27e7ea3068afe0b0e1f7cfb6c48570",
+    "variants/hamlyn/metrics.py": "c52dac700758c4e782b311b2b5632bd6d6acf3787aedacfe69777d3f63c85523",
+    "variants/hamlyn/render.py": "2ceec1ac3b4f0efbb991778077ffe71a6148d269290737df16a6af184cd39c5a",
+    "variants/hamlyn/scene/__init__.py": "630bb46821bbfbab1da678d954fdcdf0c605df61d26015a7d662c357bb55c3d2",
+    "variants/hamlyn/scene/appearace_model.py": "49556aa7894265faf96efba864ce2d54bca67d930afdcb5eb4d166b2961f55fa",
+    "variants/hamlyn/scene/cameras.py": "1a26a2693bde3552a671c18e51f0aacf74e77ceeeed63ff5ef7d8839e3c68566",
+    "variants/hamlyn/scene/colmap_loader.py": "f3b3f6ba7cf4a17e387a1f7914468fb3e44804d09a58a6595dcc79b16e207c1a",
+    "variants/hamlyn/scene/dataset_readers.py": "8612e6adda7d5693f7a0e07fd47b1cd6418d4e5170a34e10f2af44438621d9a9",
+    "variants/hamlyn/scene/encoding.py": "4ab81cfbb81f01cc5f87f7c9fdbd56bb89f1247b4996d945fdeff8de327a5773",
+    "variants/hamlyn/scene/endoscope_model.py": "7d72cf46e2c66b954449cbbfece9961559b3bb2e6b30dec0dfcd2b3dd7d8d771",
+    "variants/hamlyn/scene/gaussian_model.py": "7422969e4fcd96bd9e7ee77ffaec2735f465c160f7f56cfed6688cae4a8f340c",
+    "variants/hamlyn/train.py": "b8667018d0168768e8fd0312c93d984825691469518c34672988bdcfb5018107",
+    "variants/hamlyn/utils/camera_utils.py": "d351fe690a33d0fe030da26fd2d1c6b4ab702eee024a315a9eead2cd4a409cb4",
+    "variants/hamlyn/utils/general_utils.py": "d6b5257ef838213f2046701599b2c52036823164708bb0a8d3a6790efb302035",
+    "variants/hamlyn/utils/graphics_utils.py": "fcf6ebc849ce7dfd4d2fc4ab3c38a2c0a570983aa574991e95be82a7d5ef414a",
+    "variants/hamlyn/utils/image_utils.py": "b32dc5340b2a693b2f1075504b4d73ea31da8471990105cf8f861cfe1d509b00",
+    "variants/hamlyn/utils/loss_utils.py": "714b3668b9e06d4c2ddfb3483f6aaf7728f2e6f873c9db0131070379ab01c5a7",
+    "variants/hamlyn/utils/make_depth_scale.py": "44ca560940d752924e0fa799c8e43f4679a1659431cf2b5ea6d3ba3b9bca6988",
+    "variants/hamlyn/utils/read_write_model.py": "04a1f01f98bef7065e4b66baa6bef4840d42333614191fb535ce11fbfa3b0ba3",
+    "variants/hamlyn/utils/sh_utils.py": "10fedc66760ae4ede61c60a3c51bede29db4cbe7c541fb090963660399a30934",
+    "variants/hamlyn/utils/system_utils.py": "5a7d6ad4bdbc4d8df799fa0bd30b78ddb187c24dbb6b3c798cb1bfb8abb7dbce",
+    "variants/hamlyn/utils/white_balance.py": "b6ef1987e91d9fed63bb8d9ba4b5313ed315c3f214b265f3d02e9ab5c9295ecf"
+  }
+}
